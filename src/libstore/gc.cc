@@ -140,7 +140,7 @@ void LocalStore::addTempRoot(const StorePath & path)
             } catch (SysError & e) {
                 /* The garbage collector may have exited, so we need to
                    restart. */
-                if (e.errNo == ECONNREFUSED) {
+                if (e.errNo == ECONNREFUSED || e.errNo == ENOENT) {
                     debug("GC socket connection refused");
                     fdRootsSocket->close();
                     goto restart;
@@ -159,7 +159,7 @@ void LocalStore::addTempRoot(const StorePath & path)
         } catch (SysError & e) {
             /* The garbage collector may have exited, so we need to
                restart. */
-            if (e.errNo == EPIPE || e.errNo == ECONNRESET) {
+            if (e.errNo == EPIPE || e.errNo == ECONNRESET || e.errNo == ENOTCONN) {
                 debug("GC socket disconnected");
                 fdRootsSocket->close();
                 goto restart;
